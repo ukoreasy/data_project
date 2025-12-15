@@ -1,6 +1,7 @@
 import csv
-def read_csv(filename):
 
+
+def _read_csv(filename):
     data = []
     with open("data.csv",newline='',encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -9,6 +10,8 @@ def read_csv(filename):
             row["score"] = int(row["score"])
             data.append(row)
     return data
+
+
 #평균점수계산
 def average_score(data):
     return sum(p["score"] for p in data) / len(data)
