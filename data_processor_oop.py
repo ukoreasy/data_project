@@ -1,4 +1,6 @@
 import csv
+import matplotlib.pyplot as plt
+
 
 # 1. DataProcessor 클래스 정의
 class DataProcessor:
@@ -10,6 +12,19 @@ class DataProcessor:
         self.filename = filename
         
     # **Helper Method:** 파일 읽기는 클래스 외부에서 호출할 필요가 없으므로 _(언더바)를 붙여 내부에서만 사용하도록 관례적으로 표시합니다.
+    def plot_score_distribution(self):
+        scores = [p['score'] for p in self.data]
+        names = [p['name'] for p in self.data]
+        
+        plt.figure(figsize=(8, 5))
+        plt.bar(names, scores, color='skyblue')
+        plt.xlabel("학생 이름")
+        plt.ylabel("점수")
+        plt.title("학생별 점수 분포")
+        
+        # 그래프를 이미지 파일로 저장
+        plt.savefig("score_distribution.png")
+        print("\n[시각화] 'score_distribution.png' 파일 생성 완료")
     def _read_csv(self, filename):
         data = []
         with open(filename, newline='', encoding="utf-8") as f:
@@ -43,7 +58,7 @@ class DataProcessor:
             fieldnames = ["name", "age", "score"]
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
-            writer.writerow(data_to_save)
+            writer.writerows(data_to_save)
 def main():
     processor = DataProcessor("data.csv")
     avg = processor.calculate_average()
@@ -56,6 +71,7 @@ def main():
     processor.save_csv(above_avg_students, "above_avg_oop.csv")
     sorted_students = processor.sort_by_age()
     print("\n나이순 정렬 (전체):", sorted_students)
+    processor.plot_score_distribution()
     
 if "__main__" == "__main__":
     main()

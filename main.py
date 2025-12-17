@@ -1,7 +1,7 @@
 import csv
 
 
-def _read_csv(filename):
+def read_csv(filename):
     data = []
     with open("data.csv",newline='',encoding="utf-8") as f:
         reader = csv.DictReader(f)
