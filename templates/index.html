@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>내 데이터 분석 페이지</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; text-align: center; padding: 50px; background-color: #f4f4f4; }
+        h1 { color: navy; }
+        .container { width: 80%; margin: 0 auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; }
+        table { margin: 20px auto; border-collapse: collapse; width: 80%; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; }
+        th { background-color: navy; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 학생 데이터 분석 대시보드</h1>
+        
+        <div style="width: 70%; margin: 0 auto;">
+            <canvas id="myChart"></canvas>
+        </div>
+
+        <hr>
+
+        <h3>📋 상세 데이터</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>점수 (Score)</th>
+                    <th>밝기 (Brightness)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.score }}</td>
+                    <td><b>{{ student.brightness }}</b></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+            <hr>
+
+        <div style="margin-top: 50px; padding: 30px; background-color: #e3f2fd; border-radius: 10px;">
+            <h2>📸 AI 사진 분석기</h2>
+            <p>궁금한 사진을 업로드하면 밝기를 분석해드립니다.</p>
+            
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <button type="submit" style="padding: 10px 20px; background-color: navy; color: white; border: none; cursor: pointer;">
+                    분석 시작 🚀
+                </button>
+            </form>
+
+            {% if result_brightness %}
+            <div style="margin-top: 20px; color: red;">
+                <h3>🔍 분석 결과: 밝기 {{ result_brightness }}</h3>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // 파이썬이 보낸 데이터를 자바스크립트 변수로 받기
+        const names = {{ names | tojson }};
+        const scores = {{ scores | tojson }};
+        const brightness = {{ brightness_values | tojson }};
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar', // 그래프 종류 (bar: 막대, line: 꺾은선)
+            data: {
+                labels: names, // X축: 이름
+                datasets: [
+                    {
+                        label: '학생 점수',
+                        data: scores,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)', // 파란색
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '이미지 밝기 (AI 분석)',
+                        data: brightness,
+                        type: 'line', // 밝기는 꺾은선으로 표현! (혼합 그래프)
+                        borderColor: 'rgba(255, 99, 132, 1)', // 빨간색
+                        borderWidth: 3,
+                        yAxisID: 'y1' // 오른쪽 축 사용
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, position: 'left' },
+                    y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
